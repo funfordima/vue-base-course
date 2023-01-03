@@ -7,11 +7,11 @@
       </div>
       <div>
         <strong>Description:</strong>
-        {{ post.description }}
+        {{ post.body }}
       </div>
     </div>
     <div class="action-block">
-      <custom-button>Delete</custom-button>
+      <custom-button @click="$emit('remove', post)">Delete</custom-button>
     </div>
   </div>
 </template>

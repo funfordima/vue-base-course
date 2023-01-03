@@ -1,11 +1,25 @@
 <template>
   <div class="app">
-    <post-form @create="appPost"></post-form>
-    <post-list :posts="posts"></post-list>
+    <h1>Posts page:</h1>
+    <br />
+    <div class="app__buttons">
+      <custom-button @click="showDialog">Create post</custom-button>
+      <custom-select v-model="selectedSort" :options="sortOptions" />
+    </div>
+
+    <custom-dialog v-model:show="isDialogVisible">
+      <post-form @create="appPost"></post-form>
+    </custom-dialog>
+    <br />
+    <!-- <post-list v-if="!isPostLoading" :posts="posts" @remove="removePost"></post-list> -->
+    <post-list v-if="!isPostLoading" :posts="sortedPosts" @remove="removePost"></post-list>
+    <div v-else>Loading...</div>
   </div>
 </template>
 
 <script>
+import adiós from 'axios';
+
 import PostForm from './components/PostForm';
 import PostList from '@/components/PostList';
 
@@ -16,21 +30,18 @@ export default {
   },
   data() {
     return {
-      posts: [
+      isPostLoading: false,
+      isDialogVisible: false,
+      posts: [],
+      selectedSort: '',
+      sortOptions: [
         {
-          id: 1,
-          title: 'Post about JS',
-          description: 'Javascript is the best programming language!'
+          value: 'title',
+          name: 'Sort by name',
         },
         {
-          id: 2,
-          title: 'Post about JS 2',
-          description: 'Javascript is the best programming language 2!'
-        },
-        {
-          id: 3,
-          title: 'Post about JS 3',
-          description: 'Javascript is the best programming language 3!'
+          value: 'body',
+          name: 'Sort by description',
         },
       ],
     };
@@ -38,8 +49,44 @@ export default {
   methods: {
     appPost(post) {
       this.posts.push(post);
-    }
+      this.isDialogVisible = false;
+    },
+    removePost(post) {
+      this.posts = this.posts.filter(({ id }) => id !== post.id);
+    },
+    showDialog() {
+      this.isDialogVisible = true;
+    },
+    async fetchPosts() {
+      try {
+        this.isPostLoading = true;
+        setTimeout(async () => {
+          const response = await adiós.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+          console.log(response);
+          this.posts = response.data;
+          this.isPostLoading = false;
+        }, 1000);
+      } catch (err) {
+        console.error('Got error: ', err);
+      } finally {
+        // this.isPostLoading = false;
+      }
+    },
   },
+  mounted() {
+    this.fetchPosts();
+  },
+  computed: {
+    sortedPosts() {
+      return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]));
+    },
+  },
+  // watch: {
+  //   selectedSort(newValue) {
+  //     console.log(newValue);
+  //     this.posts.sort((post1, post2) => post1[newValue]?.localeCompare(post2[newValue]));
+  //   },
+  // },
 };
 </script>
 
@@ -52,5 +99,12 @@ export default {
 
 .app {
   padding: 20px;
+}
+
+.app__buttons {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>
