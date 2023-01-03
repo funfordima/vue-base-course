@@ -2,6 +2,10 @@
   <div class="post">
     <div>
       <div>
+        <strong>ID:</strong>
+        {{ post.id }}
+      </div>
+      <div>
         <strong>Title:</strong>
         {{ post.title }}
       </div>
