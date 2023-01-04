@@ -2,7 +2,7 @@
   <div>
     <h1>Posts page:</h1>
     <br />
-    <custom-input v-model="searchQuery" placeholder="Search by name"></custom-input>
+    <custom-input v-model="searchQuery" v-focus placeholder="Search by name"></custom-input>
     <div class="app__buttons">
       <custom-button @click="showDialog">Create post</custom-button>
       <custom-select v-model="selectedSort" :options="sortOptions" />
@@ -15,7 +15,8 @@
     <!-- <post-list v-if="!isPostLoading" :posts="posts" @remove="removePost"></post-list> -->
     <post-list v-if="!isPostLoading" :posts="sortedAndSearchedPosts" @remove="removePost"></post-list>
     <div v-else>Loading...</div>
-    <div ref="observer" class="observer"></div>
+    <!-- <div ref="observer" class="observer" v-intersection></div> -->
+    <div class="observer" v-intersection="loadMorePosts"></div>
     <!-- <div class="page-wrapper">
       <div v-for="pageNumber in totalPages" :key="pageNumber" class="page" :class="{
           'current-page': pageNumber === page
@@ -25,7 +26,7 @@
 </template>
 
 <script>
-import adiós from 'axios';
+import axios from 'axios';
 
 import PostForm from '@/components/PostForm';
 import PostList from '@/components/PostList';
@@ -76,7 +77,7 @@ export default {
       try {
         this.isPostLoading = true;
         setTimeout(async () => {
-          const response = await adiós.get('https://jsonplaceholder.typicode.com/posts', {
+          const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
             params: {
               _limit: this.limit,
               _page: this.page,
@@ -96,7 +97,7 @@ export default {
     async loadMorePosts() {
       try {
         this.page += 1;
-        const response = await adiós.get('https://jsonplaceholder.typicode.com/posts', {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
           params: {
             _limit: this.limit,
             _page: this.page,
@@ -113,19 +114,19 @@ export default {
   mounted() {
     this.fetchPosts();
 
-    const options = {
-      rootMargin: '0px',
-      threshold: 1.0
-    };
+    // const options = {
+    //   rootMargin: '0px',
+    //   threshold: 1.0
+    // };
 
-    const callback = (entries) => {
-      if (entries[0].isIntersecting && this.page < this.totalPages) {
-        this.loadMorePosts();
-      }
-    };
+    // const callback = (entries) => {
+    //   if (entries[0].isIntersecting && this.page < this.totalPages) {
+    //     this.loadMorePosts();
+    //   }
+    // };
 
-    const observer = new IntersectionObserver(callback, options);
-    observer.observe(this.$refs.observer);
+    // const observer = new IntersectionObserver(callback, options);
+    // observer.observe(this.$refs.observer);
   },
   computed: {
     sortedPosts() {
