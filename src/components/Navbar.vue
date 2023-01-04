@@ -4,6 +4,7 @@
     <div class="navbar-btns">
       <custom-button @click="$router.push('/posts')">Posts</custom-button>
       <custom-button style="margin-left: 20px" @click="$router.push('/about')">About us</custom-button>
+      <custom-button style="margin-left: 20px" @click="$router.push('/store')">Posts with store</custom-button>
     </div>
   </div>
 </template>
